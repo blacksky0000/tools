@@ -1,35 +1,53 @@
 import requests as r
 import xmltodict, re
 import threading, queue
-import json	
+import json,sys
 
 def tumblr(site, chunk, type, start):
 	res = r.get('http://{}.tumblr.com/api/read?num={}&type={}&start={}'.format(site, chunk, type, start))
-
-	if type == 'photo':
-		d = t_photo(xmltodict.parse(res.content), start, chunk)	
-		for i in d:
-			print(i)
-	if type == 'video':
-		d = t_video()
+	
+	return get_source(xmltodict.parse(res.content),type, start, chunk)
 	
 	
-def t_photo(data, start=0, chunk=0):
+def get_source(data, type, start=0, chunk=0):
+	posts = stack = []
 	try:
 		posts = data['tumblr']['posts']['post']
-		print(len(posts))
-		if chunk == 1:
-			yield posts['photo-url'][0]['#text']
-		else:
-			for i, post in enumerate(posts):
-				url = post['photo-url'][0]['#text']
-				yield url
-	except KeyError:
-		pass
-
-def t_video():
-	pass
+	except KeyError as e:
+		print(e)
 	
-		
-tumblr('mobpsycho100',1,'photo',1)
+	try:
+		if type == 'photo':
+			if chunk == 1:
+				stack.append(posts['photo-url'][0]['#text'])
+			else:
+				for i, post in enumerate(posts):
+					stack.append(post['photo-url'][0]['#text'])		
 
+		if type == 'video':
+			if chunk == 1:
+				url = posts['video-player'][1]['#text']
+				pattern = re.compile(r'[\S\s]*src="(\S*)" ')
+				match = pattern.match(url)
+				if match is not None:
+					try:
+						stack.append(match.group(1))
+					except IndexError as e:
+						print(e)
+			else:
+				for i, post in enumerate(posts):
+					url = post['video-player'][1]['#text']
+					pattern = re.compile(r'[\S\s]*src="(\S*)" ')
+					match = pattern.match(url)
+					if match is not None:
+						try:	
+							stack.append(match.group(1))
+						except IndexError as e:
+							print(e)
+	except TypeError as e:
+		pass
+	return stack
+	
+	
+if __name__ == '__main__':
+	tumblr('mobpsycho100',30,'video',1)
