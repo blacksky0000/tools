@@ -12,14 +12,14 @@ def tumblr(site, chunk, type, start):
 		sys.exit(1)
 
 	dicts = xmltodict.parse(res.content)
-	# return get_redirect(dicts, type)
-	return get_source(dicts, type, start, chunk)
+	return get_redirect(dicts, type)
+	# return get_source(dicts, type, start, chunk)
 
 def get_redirect(data, type):
 	try:
 		html_list = data['tumblr']['posts']['post']
 	except KeyError as e:
-		print('[@] Error: {}'.format(e))
+		print('[@] KeyError: {}'.format(e))
 		sys.exit(0)
 	stack = []
 	for i in html_list:
@@ -29,15 +29,15 @@ def get_redirect(data, type):
 				href = BeautifulSoup(html,'lxml').findAll('a')[0].get('href')
 			except IndexError as e:
 				continue
-				print(e)
+				print('[@] IndexError {}'.format(e))
 			othersite = urlparse(href).netloc.split('.')[0]
 			stack.append(othersite)
 			print("[&] Source from User:{}".format(othersite))
 		except KeyError as e:
-			print(e)
+			print('[@] KeyError: {}'.format(e))
 			continue
 
-	return "\n".join(stack)
+	return stack
 	
 	
 def get_source(data, type, start=0, chunk=0):
@@ -78,9 +78,8 @@ if __name__ == '__main__':
 	chunk = 20
 	with open('test.txt','wb') as f:
 		while True:
-			# 	t = tumblr('',chunk,'photo',start)
-			# 	start += chunk
-			# 	f.write(t)
+		# 	t = tumblr('',chunk,'photo',start)
+		# 	start += chunk
 			t = tumblr('',chunk,'photo',start)
-			print(t)
+			f.write("\n".join(t))
 			start += chunk
