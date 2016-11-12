@@ -5,15 +5,17 @@ import json,sys
 from bs4 import BeautifulSoup
 from urlparse import urlparse
 
-def tumblr(site, chunk, type, start):
+def tumblr(site, chunk, type, start, function):
 	res = r.get('http://{}.tumblr.com/api/read?num={}&type={}&start={}'.format(site, chunk, type, start))
 	if res.status_code != r.codes.ok:
 		print("[@] Request_code: {}, User not found.".format(res.status_code))
 		sys.exit(1)
 
 	dicts = xmltodict.parse(res.content)
-	return get_redirect(dicts, type)
-	# return get_source(dicts, type, start, chunk)
+	if function == 1:
+		return get_redirect(dicts, type)
+	if function == 2:
+		return get_source(dicts, type, start, chunk)
 
 def get_redirect(data, type):
 	try:
@@ -21,6 +23,7 @@ def get_redirect(data, type):
 	except KeyError as e:
 		print('[@] KeyError: {}'.format(e))
 		sys.exit(0)
+
 	stack = []
 	for i in html_list:
 		try:
