@@ -29,7 +29,7 @@ def calc(file):
 				earn += tmp * cost
 				train += 1
 
-				print( '{}/{} work from {}:{} to {}:{} is {} min and earn {:,.2f} en.'.format(mon, day, end_h, end_m, start_h, start_m, tmp, tmp * cost))
+				print( '{}/{} work from {}:{} to {}:{} is {} min and earn {:,.2f} en.'.format(mon, day, start_h, start_m, end_h, end_m, tmp, tmp * cost))
 
 			if 'pre:' in line:
 				pre = int(line.split(':')[1])
