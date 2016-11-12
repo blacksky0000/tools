@@ -3,6 +3,7 @@ import re, urllib, os, sys
 from name_gen import getName
 import hashlib
 from tqdm import tqdm
+from urlparse import urlparse
 
 CHUNK_SIZE = 2048
 
@@ -13,10 +14,10 @@ def download_with_url(url, file_path='./'):
 	file_type = res.headers.get('Content-type')
 
 	if file_len is None or file_type is None:
-		print('[æ] Length or Type missing')
+		print('[?] Length or Type missing')
 		return
 		
-	parse = urllib.parse.urlparse(url)	
+	parse = urlparse(url)
 	full_path = file_path + parse.netloc
 
 	hash = hashlib.md5()

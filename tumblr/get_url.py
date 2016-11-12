@@ -1,12 +1,43 @@
 import requests as r
 import xmltodict, re
-import threading, queue
+import threading
 import json,sys
+from bs4 import BeautifulSoup
+from urlparse import urlparse
 
 def tumblr(site, chunk, type, start):
 	res = r.get('http://{}.tumblr.com/api/read?num={}&type={}&start={}'.format(site, chunk, type, start))
-	
-	return get_source(xmltodict.parse(res.content),type, start, chunk)
+	if res.status_code != r.codes.ok:
+		print("[@] Request_code: {}, User not found.".format(res.status_code))
+		sys.exit(1)
+
+	dicts = xmltodict.parse(res.content)
+	# return get_redirect(dicts, type)
+	return get_source(dicts, type, start, chunk)
+
+def get_redirect(data, type):
+	try:
+		html_list = data['tumblr']['posts']['post']
+	except KeyError as e:
+		print('[@] Error: {}'.format(e))
+		sys.exit(0)
+	stack = []
+	for i in html_list:
+		try:
+			html = i['{}-caption'.format(type)]
+			try:
+				href = BeautifulSoup(html,'lxml').findAll('a')[0].get('href')
+			except IndexError as e:
+				continue
+				print(e)
+			othersite = urlparse(href).netloc.split('.')[0]
+			stack.append(othersite)
+			print("[&] Source from User:{}".format(othersite))
+		except KeyError as e:
+			print(e)
+			continue
+
+	return "\n".join(stack)
 	
 	
 def get_source(data, type, start=0, chunk=0):
@@ -43,5 +74,13 @@ def get_source(data, type, start=0, chunk=0):
 
 		
 if __name__ == '__main__':
-	t = tumblr('',20,'video',1)
-	print(t)
+	start = 0
+	chunk = 20
+	with open('test.txt','wb') as f:
+		while True:
+			# 	t = tumblr('',chunk,'photo',start)
+			# 	start += chunk
+			# 	f.write(t)
+			t = tumblr('',chunk,'photo',start)
+			print(t)
+			start += chunk

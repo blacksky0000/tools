@@ -1,7 +1,7 @@
 import get_url as g
 import download_file as d
 from threading import Thread
-import queue,time
+import time
 
 	
 def	auto(site, type, start=0, chunk=20):
@@ -16,5 +16,5 @@ def	auto(site, type, start=0, chunk=20):
 		print('Finish download.')
 		
 		
-auto('sexphotoclub','photo',238, 50)
+auto('','video',10, 10)
 
