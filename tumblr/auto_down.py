@@ -11,7 +11,7 @@ def	auto(site, type, start=0, chunk=20, function=2):
 		return
 	if function == 1:
 		name_list = list(set(data))
-		check_exists(name_list)
+		return check_exists(name_list)
 	elif function == 2:
 		for j,i in enumerate(data):
 			print('Start at {}'.format(j+start))
@@ -26,24 +26,38 @@ def check_exists(data, file_name=None):
 		with open(file_name,'r') as f:
 			for i, line in enumerate(f):
 				user_name = line.rstrip('\n')
-				res = r.get('http://{}.tumblr.com/api/read?num={}&type={}&start={}'.format(user_name, 1, 'photo', 0))
+				try:
+					res = r.get('http://{}.tumblr.com/'.format(user_name))
+				except r.exceptions.InvalidURL as e:
+					print("[@] Error: {}, InvalidURL".format(e))
+					continue
+
 				if res.status_code != r.codes.ok:
 					print("[@] num: {} Request_code: {}, User: {} not found.".format(i, res.status_code, user_name))
 					continue
 				else:
 					f1.write('user: {}\n'.format(user_name))
 					print("[+] num: {} User: {} exists".format(i, user_name))
+
 	else:
-		f1 = open('test1.txt','ab+');
+		exists = []
 		for i, line in enumerate(data):
 			user_name = line.rstrip('\n')
-			res = r.get('http://{}.tumblr.com/api/read?num={}&type={}&start={}'.format(user_name, 1, 'photo', 0))
+			try:
+				res = r.get('http://{}.tumblr.com/'.format(user_name))
+			except r.exceptions.InvalidURL as e:
+				print("[@] Error: {}, InvalidURL".format(e))
+				continue
+
 			if res.status_code != r.codes.ok:
 				print("[@] num: {} Request_code: {}, User: {} not found.".format(i, res.status_code, user_name))
 				continue
+			
 			else:
-				f1.write('user: {}\n'.format(user_name))				
+				exists.append(user_name)
 				print("[+] num: {} User: {} exists".format(i, user_name))
+
+		return exists
 
 
 
@@ -61,11 +75,33 @@ def uniq(file_name):
 
 
 if __name__ == '__main__':
-	# start = 0
-	# chunk = 20
-	# while True:
-	# 	print("[!] Start with {}".format(start))
-	# 	auto('','photo', start, chunk, 1)
-	# 	start += chunk
+	start = 2560
+	chunk = 20
+	with open("list.txt", "ab+") as f:
+		while True:
+			print("[!] Start with {}".format(start))
+			tmp = auto('','photo', start, chunk, 1)
+			try:
+				for line in list(set(tmp)):
+					f.write("{}\n".format(line))
+			except TypeError as e:
+				print("[@] TypeError: {}, tmp is empty".format(e))
 
-	uniq('test1.txt')
+			start += chunk
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

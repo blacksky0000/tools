@@ -29,7 +29,7 @@ def get_redirect(data, type):
 		try:
 			html = i['{}-caption'.format(type)]
 			try:
-				href = BeautifulSoup(html,'lxml').findAll('a')[0].get('href')
+				href = BeautifulSoup(html, "html.parser").findAll('a')[0].get('href')
 			except IndexError as e:
 				continue
 				print('[@] IndexError {}'.format(e))

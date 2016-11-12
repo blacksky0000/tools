@@ -20,13 +20,22 @@ def download_with_url(url, file_path='./'):
 	parse = urlparse(url)
 	full_path = file_path + parse.netloc
 
+	buf = ""
 	hash = hashlib.md5()
-	hash.update(res.content)
+
+	pbar = tqdm(total=int(file_len), unit="B", unit_scale=True)
+	for chunk in res.iter_content(2048):
+		buf += chunk
+		hash.update(chunk)
+		pbar.update(len(chunk))
+
+	pbar.close()
+
 	file_name = hash.hexdigest()
 	print('[+] File hash is:{}'.format(file_name))
 
 	make_dir(full_path)
-	return save_file(res.iter_content(CHUNK_SIZE), '{}/{}'.format(full_path,'{}.{}'.format(file_name,file_type.split('/')[-1])), int(file_len))
+	return save_file(buf, '{}/{}'.format(full_path,'{}.{}'.format(file_name,file_type.split('/')[-1])))
 
 
 def make_dir(path):
@@ -37,18 +46,18 @@ def make_dir(path):
 		print('[*] {} is exists'.format(path))
 
 
-def save_file(contents, path, size):
+def save_file(contents, path):
 	if os.path.isfile(path):
 		print('[!] file exist')
 		return True
-	pbar = tqdm(total=size, unit='B', unit_scale=True)
 	with open(path, 'wb') as f:
-		for chunk in tqdm(contents):
-			f.write(chunk)
-			pbar.update(len(chunk))
-		pbar.close()
+		# for chunk in buf:
+		# 	f.write(chunk)
+		f.write(contents)
+
 		print('[+] created new file:{}'.format(path.split('/')[-1]))
 
 
-
+if __name__ == '__main__':
+	download_with_url("http://download.thinkbroadband.com/100MB.zip")
 
