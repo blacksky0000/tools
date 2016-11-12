@@ -18,36 +18,30 @@ def get_source(data, type, start=0, chunk=0):
 	
 	try:
 		if type == 'photo':
-			if chunk == 1:
-				stack.append(posts['photo-url'][0]['#text'])
-			else:
-				for i, post in enumerate(posts):
+			for i, post in enumerate(posts):
+				try:
 					stack.append(post['photo-url'][0]['#text'])		
+				except KeyError:
+					continue
 
 		if type == 'video':
-			if chunk == 1:
-				url = posts['video-player'][1]['#text']
+			for i, post in enumerate(posts):
+				try:
+					url = post['video-player'][1]['#text']
+				except KeyError:
+					continue
 				pattern = re.compile(r'[\S\s]*src="(\S*)" ')
 				match = pattern.match(url)
 				if match is not None:
-					try:
+					try:	
 						stack.append(match.group(1))
 					except IndexError as e:
 						print(e)
-			else:
-				for i, post in enumerate(posts):
-					url = post['video-player'][1]['#text']
-					pattern = re.compile(r'[\S\s]*src="(\S*)" ')
-					match = pattern.match(url)
-					if match is not None:
-						try:	
-							stack.append(match.group(1))
-						except IndexError as e:
-							print(e)
 	except TypeError as e:
 		pass
 	return stack
-	
-	
+
+		
 if __name__ == '__main__':
-	tumblr('mobpsycho100',30,'video',1)
+	t = tumblr('',20,'video',1)
+	print(t)
