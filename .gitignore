@@ -9,3 +9,5 @@ test*.*
 *.pyc
 
 list*.*
+
+tmp*

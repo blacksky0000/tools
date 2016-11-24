@@ -4,7 +4,7 @@ from threading import Thread
 import time
 import requests as r
 
-	
+
 def	auto(site, type, start=0, chunk=20, function=2):
 	data = g.tumblr(site, chunk, type, start, function)
 	if not data:
@@ -19,7 +19,7 @@ def	auto(site, type, start=0, chunk=20, function=2):
 			d.download_with_url(i)
 			time.sleep(1)
 			print('Finish download.')
-		
+
 def check_exists(data, file_name=None):
 	if data is None:
 		f1 = open('test1.txt','ab+');
@@ -52,7 +52,7 @@ def check_exists(data, file_name=None):
 			if res.status_code != r.codes.ok:
 				print("[@] num: {} Request_code: {}, User: {} not found.".format(i, res.status_code, user_name))
 				continue
-			
+
 			else:
 				exists.append(user_name)
 				print("[+] num: {} User: {} exists".format(i, user_name))
@@ -75,17 +75,17 @@ def uniq(file_name):
 
 
 if __name__ == '__main__':
-	start = 2560
+	start = 524
 	chunk = 20
 	with open("list.txt", "ab+") as f:
 		while True:
 			print("[!] Start with {}".format(start))
-			tmp = auto('','photo', start, chunk, 1)
+			tmp = auto('','photo', start, chunk, 2)
 			try:
 				for line in list(set(tmp)):
 					f.write("{}\n".format(line))
 			except TypeError as e:
-				print("[@] TypeError: {}, tmp is empty".format(e))
+				print(e)
 
 			start += chunk
 

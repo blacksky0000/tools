@@ -49,6 +49,7 @@ def get_source(data, type, start=0, chunk=0):
 		posts = data['tumblr']['posts']['post']
 	except KeyError as e:
 		print(e)
+		sys.exit(0)
 	
 	try:
 		if type == 'photo':
