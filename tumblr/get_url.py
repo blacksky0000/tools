@@ -5,13 +5,16 @@ import json,sys
 from bs4 import BeautifulSoup
 from urlparse import urlparse
 
-def tumblr(site, chunk, type, start, function):
+def tumblr(site, chunk, type, start, function=1):
 	res = r.get('http://{}.tumblr.com/api/read?num={}&type={}&start={}'.format(site, chunk, type, start))
 	if res.status_code != r.codes.ok:
 		print("[@] Request_code: {}, User not found.".format(res.status_code))
 		sys.exit(1)
 
 	dicts = xmltodict.parse(res.content)
+	print "[+] Total: {}".format(dicts['tumblr']['posts']['@total'])
+	# return res
+
 	if function == 1:
 		return get_redirect(dicts, type)
 	if function == 2:
@@ -22,7 +25,7 @@ def get_redirect(data, type):
 		html_list = data['tumblr']['posts']['post']
 	except KeyError as e:
 		print('[@] KeyError: {}'.format(e))
-		sys.exit(0)
+		return None
 
 	stack = []
 	for i in html_list:
@@ -49,13 +52,17 @@ def get_source(data, type, start=0, chunk=0):
 		posts = data['tumblr']['posts']['post']
 	except KeyError as e:
 		print(e)
-		sys.exit(0)
+		return None
 	
 	try:
 		if type == 'photo':
 			for i, post in enumerate(posts):
 				try:
-					stack.append(post['photo-url'][0]['#text'])		
+					if post['photoset']:
+						for j, sub_post in enumerate(post['photoset']['photo']):
+							stack.append(post['photoset']['photo'][j]['photo-url'][0]['#text'])
+					else:
+						stack.append(post['photo-url'][0]['#text'])		
 				except KeyError:
 					continue
 
@@ -78,12 +85,5 @@ def get_source(data, type, start=0, chunk=0):
 
 		
 if __name__ == '__main__':
-	start = 0
-	chunk = 20
-	with open('test.txt','wb') as f:
-		while True:
-		# 	t = tumblr('',chunk,'photo',start)
-		# 	start += chunk
-			t = tumblr('',chunk,'photo',start)
-			f.write("\n".join(t))
-			start += chunk
+	print tumblr('',1,'photo',6, 2).content
+	

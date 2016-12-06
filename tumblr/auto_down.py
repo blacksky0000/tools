@@ -1,20 +1,25 @@
+#!/Users/kingno21/.virtualenvs/test/bin/python
 import get_url as g
 import download_file as d
 from threading import Thread
 import time
 import requests as r
+import sort_uniq as s
 
 
 def	auto(site, type, start=0, chunk=20, function=2):
 	data = g.tumblr(site, chunk, type, start, function)
+
+	if data == None:
+		return None
 	if not data:
-		return
+		return []
 	if function == 1:
 		name_list = list(set(data))
 		return check_exists(name_list)
 	elif function == 2:
 		for j,i in enumerate(data):
-			print('Start at {}'.format(j+start))
+			print('[Chunck]: {}'.format(j+1))
 			print('[URL]: {}'.format(i))
 			d.download_with_url(i)
 			time.sleep(1)
@@ -60,27 +65,24 @@ def check_exists(data, file_name=None):
 		return exists
 
 
-
-def uniq(file_name):
-	stack = []
-	with open(file_name, 'r') as f:
-		for line in f:
-			stack.append(line.rstrip('\n'))
-		f.close()
-
-	with open(file_name, 'wb') as f:
-		for i, line in enumerate(list(set(stack))):
-			f.write("{}\n".format(line))
-			print("[+] num: {:03} User: {}".format(i, line))
-
-
 if __name__ == '__main__':
-	start = 524
+
+
+	tmp_file = 'list.txt'
+	search_name = ''
+	search_type = 'photo'
+	save_path = '.list'
+	start = 0
 	chunk = 20
-	with open("list.txt", "ab+") as f:
+	spy_or_down = 1
+
+
+	with open(tmp_file, "ab+") as f:
 		while True:
 			print("[!] Start with {}".format(start))
-			tmp = auto('','photo', start, chunk, 2)
+			tmp = auto(search_name, search_type, start, chunk, spy_or_down)
+			if tmp == None:
+				break
 			try:
 				for line in list(set(tmp)):
 					f.write("{}\n".format(line))
@@ -88,6 +90,9 @@ if __name__ == '__main__':
 				print(e)
 
 			start += chunk
+
+	s.sort_uniq(tmp_file, search_name, search_type, save_path)
+
 
 
 

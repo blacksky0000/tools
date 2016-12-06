@@ -8,7 +8,10 @@ from urlparse import urlparse
 CHUNK_SIZE = 2048
 
 def download_with_url(url, file_path='./'):
-	res = r.get(url, stream=True);
+	try:
+		res = r.get(url, stream=True);
+	except:
+		return
 
 	file_len = res.headers.get('Content-Length')
 	file_type = res.headers.get('Content-type')

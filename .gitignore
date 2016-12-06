@@ -11,3 +11,10 @@ test*.*
 list*.*
 
 tmp*
+
+tumblr/.list/*
+*.xml
+*.sh
+.screen
+ghostdriver.log
+pay.txt
