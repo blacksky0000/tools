@@ -25,7 +25,7 @@ def screen_shot(search_name, file_path):
 
 if __name__ == '__main__':
 
-	file_name = ''
+	file_name = 'test2_photo'
 	save_path = './.screen/{}'.format(file_name)
 
 	d.make_dir(save_path)

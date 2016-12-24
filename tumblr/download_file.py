@@ -7,7 +7,7 @@ from urlparse import urlparse
 
 CHUNK_SIZE = 2048
 
-def download_with_url(url, file_path='./'):
+def download_with_url(url, file_path='./', file_name=None):
 	try:
 		res = r.get(url, stream=True);
 	except:
@@ -34,8 +34,11 @@ def download_with_url(url, file_path='./'):
 
 	pbar.close()
 
-	file_name = hash.hexdigest()
-	print('[+] File hash is:{}'.format(file_name))
+	if file_name == None:
+		file_name = hash.hexdigest()
+		print('[+] File hash is:{}'.format(file_name))
+	else:
+		print('[+] File Name is:{}'.format(file_name))
 
 	make_dir(full_path)
 	return save_file(buf, '{}/{}'.format(full_path,'{}.{}'.format(file_name,file_type.split('/')[-1])))
