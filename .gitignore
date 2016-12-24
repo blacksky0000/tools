@@ -18,3 +18,6 @@ tumblr/.list/*
 .screen
 ghostdriver.log
 pay.txt
+
+.idea
+twitter/config
