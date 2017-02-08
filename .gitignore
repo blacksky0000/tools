@@ -17,7 +17,7 @@ tumblr/.list/*
 *.sh
 .screen
 ghostdriver.log
-pay.txt
+*.txt
 
 .idea
 twitter/config

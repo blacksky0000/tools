@@ -35,6 +35,10 @@ def calc(file):
 				pre = int(line.split(':')[1])
 				earn -= pre
 				print( 'Advance: {:,.2f} and remain: {:,.2f}'.format(pre, earn))
+			if 'add:' in line:
+				pre = int(line.split(':')[1])
+				earn += pre
+				print( 'Extra: {:,.2f} and total: {:,.2f}'.format(pre, earn))
 			if 'fin' in line:
 				print( 'At mon: {}, work {} days'.format(mon,train))
 				print( 'work: {}:{} -- payment:{:,.2f} + transfer: {:,} = earn: {:,.2f}.\n\n'.format(int(work_time/60), int(work_time%60),earn, train*train_cost, earn + train * train_cost)	)
@@ -58,8 +62,9 @@ def main():
 			print( '\tmon: <Month>, cost: <Cost=1000>, trans: <trans=500/one_way>')
 			print( '\t<mon>/<day> <start_hour>:<start_min> - <end_hour>:<end_min>')
 			print( '\tpre: <price>')
+			print( '\tadd: <count>')
 			print( '\tfin')
-			print()
+			print
 			print( 'Time is 24h format.')
 
 	if not opts:
