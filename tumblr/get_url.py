@@ -12,6 +12,7 @@ def tumblr(site, chunk, type, start, function=1):
 		sys.exit(1)
 
 	dicts = xmltodict.parse(res.content)
+
 	print "[+] Total: {}".format(dicts['tumblr']['posts']['@total'])
 	# return res
 
@@ -47,24 +48,36 @@ def get_redirect(data, type):
 	
 	
 def get_source(data, type, start=0, chunk=0):
-	posts = stack = []
+	posts = []
+	stack = []
 	try:
 		posts = data['tumblr']['posts']['post']
+		print "find {} elements".format(len(posts))
+
 	except KeyError as e:
 		print(e)
 		return None
 	
 	try:
 		if type == 'photo':
+
 			for i, post in enumerate(posts):
 				try:
+
+					if post['photo-url']:
+						stack.append(post['photo-url'][0]['#text'])
+
 					if post['photoset']:
 						for j, sub_post in enumerate(post['photoset']['photo']):
+							# print post['photoset']['photo'][j]['photo-url'][0]['#text']
+							# print 
 							stack.append(post['photoset']['photo'][j]['photo-url'][0]['#text'])
 					else:
-						stack.append(post['photo-url'][0]['#text'])		
+						continue
+
 				except KeyError:
 					continue
+
 
 		if type == 'video':
 			for i, post in enumerate(posts):

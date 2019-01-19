@@ -4,7 +4,7 @@ import download_file as d
 from threading import Thread
 import time
 import requests as r
-import sort_uniq as s
+import dbconnect
 
 def auto(site, type, start=0, chunk=20, function=2):
     data = g.tumblr(site, chunk, type, start, function)
@@ -67,26 +67,27 @@ def check_exists(data, file_name=None):
 
 if __name__ == '__main__':
 
-    tmp_file = 'list.txt'
-    search_name = ''
-    search_type = 'photo'
+    search_name = 'doridorijam'
+    search_type = 'video'
     save_path = '.list'
     start = 0
     chunk = 20
     spy_or_down = 1
 
-    with open(tmp_file, "ab+") as f:
-        while True:
-            print("[!] Start with {}".format(start))
-            tmp = auto(search_name, search_type, start, chunk, spy_or_down)
+    lists = dbconnect.db().members
+    lists.create_index([('user.tumblr_user_name', 'text')], unique=True)
+
+    while True:
+        print("[!] Start with {}".format(start))
+        tmp = auto(search_name, search_type, start, chunk, spy_or_down)
+        if spy_or_down == 1:
             if tmp == None:
                 break
-            try:
-                for line in list(set(tmp)):
-                    f.write("{}\n".format(line))
-            except TypeError as e:
-                print(e)
 
-            start += chunk
+            for line in list(set(tmp)):
+                try:
+                    lists.insert_one({ 'user': {'tumblr_user_name': line}})
+                except Exception as e:
+                    print(e)
 
-    s.sort_uniq(tmp_file, search_name, search_type, save_path)
+        start += chunk
